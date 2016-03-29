@@ -3,7 +3,7 @@ FROM debian:jessie
 MAINTAINER David Martinez Marti (Gestiweb) "desarrollo@gestiweb.com"
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN sed -i 's|main|main contrib nonfree|' /etc/apt/sources.list
+RUN sed -i 's|main|main contrib non-free|' /etc/apt/sources.list
 
 RUN apt-get update -y -qq && \
       apt-get dist-upgrade -y && apt-get install -yqq \
