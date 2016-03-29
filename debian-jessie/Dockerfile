@@ -16,6 +16,9 @@ RUN apt-get update -y -qq && \
     debconf-utils \
     tzdata \
     unzip \
+    gamin \
+    python \
+    python3 \
     wget \
     ca-certificates \
     bash \
