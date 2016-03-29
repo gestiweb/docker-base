@@ -39,6 +39,4 @@ RUN apt-get update -y -qq && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
   mkdir -p /etc/logrotate.docker.d
 
-ADD rootfs /
-
 CMD ["bash"]
