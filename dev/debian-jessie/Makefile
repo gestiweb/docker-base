@@ -13,3 +13,6 @@ clean-container:
 	@docker rm debian-jessie || echo "debian-jessie: Does not exist yet. OK."
 run: clean-container
 	docker run -d --name debian-jessie gestiweb/debian-jessie
+
+push: build
+	docker push gestiweb/debian-jessie

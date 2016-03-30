@@ -13,3 +13,6 @@ clean-container:
 	@docker rm apache-server || echo "Apache-Server: Does not exist yet. OK."
 run: clean-container
 	docker run -d --name apache-server gestiweb/apache-server
+
+push: build
+	docker push gestiweb/apache-server
