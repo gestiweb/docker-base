@@ -9,7 +9,7 @@ build: remove
 
 
 clean-container:
-	docker stop apache-server
-	docker rm apache-server
+	@docker stop apache-server || echo "Apache-Server: Not running. OK."
+	@docker rm apache-server || echo "Apache-Server: Does not exist yet. OK."
 run: clean-container
 	docker run -d --name apache-server gestiweb/apache-server
