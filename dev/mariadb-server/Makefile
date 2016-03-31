@@ -5,7 +5,7 @@ help:
 remove:
 	docker images -q gestiweb/mariadb-server:latest
 build: remove
-	docker build --tag gestiweb/mariadb-server:latest $(CURDIR)
+	docker build --no-cache --tag gestiweb/mariadb-server:latest $(CURDIR)
 
 
 clean-container:
