@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM gestiweb/minimal:debian-jessie
 
 MAINTAINER David Martinez Marti (Gestiweb) "desarrollo@gestiweb.com"
 
@@ -8,34 +8,24 @@ RUN sed -i 's|main|main contrib non-free|' /etc/apt/sources.list
 RUN apt-get update -y -qq && \
     apt-get install -yqq \
     sudo openssh-server \
-    apt-utils \
-    aptitude \
-    dialog \
-    debconf-utils \
-    tzdata \
-    unzip \
-    gamin \
-    python \
-    python3 \
-    wget \
+    apt-utils aptitude \
+    dialog debconf-utils \
+    unzip less \
+    python python3 \
+    wget locales \
     ca-certificates \
     bash \
-    bash-completion \
     ncurses-base \
     vim \
     nano \
     gettext \
-    logrotate \
     procps \
     build-essential \
     iotop \
     nmap \
-    ca-certificates inotify-tools \
-    pwgen supervisor unrar unzip wget \
+    inotify-tools \
+    supervisor wget \
     curl && \
-    rm -rf /var/lib/apt/lists/* && \
-    echo "Europe/Berlin" > /etc/timezone && \
-    dpkg-reconfigure -f noninteractive tzdata && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
