@@ -6,9 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN sed -i 's|main|main contrib non-free|' /etc/apt/sources.list
 
 RUN apt-get update -y -qq && \
-      apt-get dist-upgrade -y && apt-get install -yqq \
-    libreadline-gplv2-dev \
-    libfreetype6 \
+    apt-get install -yqq \
     sudo openssh-server \
     apt-utils \
     aptitude \
@@ -39,7 +37,10 @@ RUN apt-get update -y -qq && \
     echo "Europe/Berlin" > /etc/timezone && \
     dpkg-reconfigure -f noninteractive tzdata && \
   apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  mkdir -p /etc/logrotate.docker.d
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-CMD ["bash"]
+COPY start_container.sh /start_container.sh
+
+EXPOSE 22
+
+CMD ["/start_container.sh"]
