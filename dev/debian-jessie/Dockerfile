@@ -1,4 +1,4 @@
-FROM gestiweb/base:debian-jessie
+FROM gestiweb/debian-jessie:base
 
 COPY start_container.sh /start_container.sh
 

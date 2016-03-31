@@ -15,4 +15,4 @@ run: clean-container
 	docker run -d --name debian-jessie gestiweb/debian-jessie
 
 push: build
-	docker push gestiweb/debian-jessie
+	docker push gestiweb/debian-jessie:latest
