@@ -1,4 +1,4 @@
-FROM gestiweb/base:apache-server
+FROM gestiweb/apache-server:base
 
 COPY start_container.sh /start_container.sh
 
