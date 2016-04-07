@@ -15,4 +15,4 @@ run: clean-container
 	docker run -d --name mariadb-server gestiweb/mariadb-server
 
 push: build
-	docker push gestiweb/mariadb-server
+	docker push gestiweb/mariadb-server:latest

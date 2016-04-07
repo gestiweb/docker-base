@@ -15,4 +15,4 @@ run: clean-container
 	docker run -d --name apache-server gestiweb/apache-server
 
 push: build
-	docker push gestiweb/apache-server
+	docker push gestiweb/apache-server:latest
