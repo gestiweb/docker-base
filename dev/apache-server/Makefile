@@ -5,7 +5,7 @@ help:
 remove:
 	docker images -q gestiweb/apache-server:latest
 build: remove
-	docker build --tag gestiweb/apache-server:latest $(CURDIR)
+	docker build --pull --tag gestiweb/apache-server:latest $(CURDIR)
 
 
 clean-container:
