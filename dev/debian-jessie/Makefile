@@ -5,7 +5,7 @@ help:
 remove:
 	docker images -q gestiweb/debian-jessie:latest
 build: remove
-	docker build --tag gestiweb/debian-jessie:latest $(CURDIR)
+	docker build --pull --tag gestiweb/debian-jessie:latest $(CURDIR)
 
 
 clean-container:
