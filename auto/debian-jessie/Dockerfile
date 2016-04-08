@@ -7,7 +7,7 @@ RUN sed -i 's|main|main contrib non-free|' /etc/apt/sources.list
 
 RUN apt-get update -y -qq && \
     apt-get install -yqq aptitude && \
-    aptitude install -yqq \
+    aptitude install -y -q2 \
     sudo openssh-server \
     apt-utils aptitude \
     dialog debconf-utils \
