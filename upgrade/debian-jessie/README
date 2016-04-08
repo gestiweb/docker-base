@@ -1,0 +1,8 @@
+Imagen de upgrade de debian jessie
+
+
+Funciona con makefiles para pensar menos.
+
+Simplemente "make build" y fin!.
+
+(Si no estás en el grupo docker, pues... "sudo make" y tal)

@@ -6,7 +6,8 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN sed -i 's|main|main contrib non-free|' /etc/apt/sources.list
 
 RUN apt-get update -y -qq && \
-    apt-get install -yqq \
+    apt-get install -yqq aptitude && \
+    aptitude install -yqq \
     sudo openssh-server \
     apt-utils aptitude \
     dialog debconf-utils \
@@ -25,7 +26,7 @@ RUN apt-get update -y -qq && \
     nmap \
     inotify-tools \
     supervisor wget pwgen \
-    curl && apt-get dist-upgrade -yqq && \
+    curl && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
