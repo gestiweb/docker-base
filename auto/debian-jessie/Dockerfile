@@ -24,8 +24,8 @@ RUN apt-get update -y -qq && \
     iotop \
     nmap \
     inotify-tools \
-    supervisor wget \
-    curl && \
+    supervisor wget pwgen \
+    curl && apt-get dist-upgrade -yqq && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
