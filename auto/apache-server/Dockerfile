@@ -1,4 +1,4 @@
-FROM gestiweb/debian-jessie:latest
+FROM gestiweb/debian-jessie:upgrade-20160408
 
 MAINTAINER David Martinez Marti (Gestiweb) "desarrollo@gestiweb.com"
 
