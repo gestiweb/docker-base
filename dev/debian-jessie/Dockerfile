@@ -1,7 +1,7 @@
-FROM gestiweb/debian-jessie:base-20160408
+FROM gestiweb/debian-jessie:upgrade-20160408
 
 RUN apt-get update -y -qq && \
-    apt-get install -yqq \
+    apt-get dist-upgrade -yqq && apt-get install -yqq \
     nmap && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

@@ -49,7 +49,7 @@ Example route of compiling
 *debian-jessie*
 
 0. gestiweb/base:debian-jessie (raw image)
-0. gestiweb/auto:debian-jessie-20160408c (package bundle at hub)
+0. gestiweb/auto:debian-jessie-20160408d (package bundle at hub)
 0. gestiweb/debian-jessie:upgrade-20160408 | :upgrade (upgrade layer)
 0. gestiweb/debian-jessie:20160408 | :latest (release layer)
 

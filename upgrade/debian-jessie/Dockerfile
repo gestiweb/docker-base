@@ -1,7 +1,7 @@
-FROM gestiweb/auto:debian-jessie-20160408b
+FROM gestiweb/auto:debian-jessie-20160408d
 
 RUN apt-get update -y -qq && \
-    apt-get install -yqq \
+    aptitude install -y -q2 \
     nmap && \
   apt-get dist-upgrade -yqq && apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
