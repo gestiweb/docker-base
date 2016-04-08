@@ -49,15 +49,15 @@ Example route of compiling
 *debian-jessie*
 
 0. gestiweb/base:debian-jessie (raw image)
-0. gestiweb/auto:debian-jessie-20160406c (package bundle at hub)
-0. gestiweb/debian-jessie:upgrade-20160406 | :upgrade (upgrade layer)
-0. gestiweb/debian-jessie:20160406 | :latest (release layer)
+0. gestiweb/auto:debian-jessie-20160408c (package bundle at hub)
+0. gestiweb/debian-jessie:upgrade-20160408 | :upgrade (upgrade layer)
+0. gestiweb/debian-jessie:20160408 | :latest (release layer)
 
 *apache-server*
-0. gestiweb/debian-jessie:upgrade-20160406 | :upgrade (from debian-jessie)
-0. gestiweb/auto:apache-server-20160406 (package bundle at hub)
-0. gestiweb/apache-server:upgrade-20160406 | :upgrade (upgrade layer)
-0. gestiweb/apache-server:20160406 | :latest (release layer)
+0. gestiweb/debian-jessie:upgrade-20160408 | :upgrade (from debian-jessie)
+0. gestiweb/auto:apache-server-20160408 (package bundle at hub)
+0. gestiweb/apache-server:upgrade-20160408 | :upgrade (upgrade layer)
+0. gestiweb/apache-server:20160408 | :latest (release layer)
 
 
 *TL-DR;*
