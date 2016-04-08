@@ -1,9 +1,9 @@
-FROM gestiweb/debian-jessie:base
+FROM gestiweb/auto:debian-jessie-20160408
 
 RUN apt-get update -y -qq && \
     apt-get install -yqq \
-    htop && \
-  apt-get clean && \
+    nmap && \
+  apt-get dist-upgrade -yqq && apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY start_container.sh /start_container.sh
