@@ -1,4 +1,4 @@
-FROM gestiweb/debian-jessie
+FROM gestiweb/debian-jessie:upgrade-20160408
 
 MAINTAINER David Martinez Marti (Gestiweb) "desarrollo@gestiweb.com"
 
@@ -16,4 +16,7 @@ RUN apt-get update -y -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-CMD ["bash"]
+
+EXPOSE 22
+
+CMD ["/start_container.sh"]
