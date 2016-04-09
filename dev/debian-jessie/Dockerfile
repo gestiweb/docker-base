@@ -1,4 +1,4 @@
-FROM gestiweb/debian-jessie:upgrade-20160408
+FROM gestiweb/debian-jessie:upgrade
 
 RUN apt-get update -y -qq && \
     apt-get dist-upgrade -yqq && apt-get install -yqq \
