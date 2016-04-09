@@ -11,6 +11,9 @@ fi
 if [ "$OUTPUT_MODE" = "-q" ]; then
     OUTPUT_MODE="--output=images"
 fi
+if [ "$OUTPUT_MODE" = "-v" ]; then
+    OUTPUT_MODE="--output=fulltags"
+fi
 
 TAGS=$(docker images "$IMAGE_NAME" 2>/dev/null | sed 's/  */ /g' | tail -n+2 | cut -f2 -d' ' | grep -E '^'"$TAG_REGEXP"'$')
 
@@ -20,9 +23,15 @@ if [ "$TAGS" = "" ]; then
 fi
 
 if [ "$OUTPUT_MODE" = "--output=tags" ]; then
-    for tag in $TAGS; do
+    ( for tag in $TAGS; do
         echo $tag
-    done
+    done ) | sort -u
+    exit 0;
+fi
+if [ "$OUTPUT_MODE" = "--output=fulltags" ]; then
+    ( for tag in $TAGS; do
+        echo "$1:$tag"
+    done ) | sort -u
     exit 0;
 fi
 

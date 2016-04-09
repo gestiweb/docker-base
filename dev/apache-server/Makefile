@@ -20,12 +20,17 @@ LATEST_IMAGE := $(USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)
 DATE_IMAGE := $(USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)-$(ts)
 
 OLDIMAGES := $(shell docker-image-tags $(IMAGE) '$(IMAGE_TAG).*' -q 2>/dev/null)
+OLDTAGS := $(shell docker-image-tags $(IMAGE) '$(IMAGE_TAG).*' -v 2>/dev/null)
 
 
 help:
 	@echo "make build: -> compile new image $(LATEST_IMAGE) and replace :$(IMAGE_TAG) tag"
 	@echo "make run: -> execute new container $(CONTAINER_NAME) from image $(LATEST_IMAGE), removing the previous container if it exists."
-
+	@echo "make push: -> push image to docker hub. Implies build."
+	@echo "make list-containers: -> list of known containers using images from this folder"
+	@echo "make list-images: -> list of known images built from this folder"
+	@echo "make clean: -> stops, removes devel containers and removes known images "
+	@echo "make push: -> "
 build:
 	docker build --pull --tag $(LATEST_IMAGE) --tag $(DATE_IMAGE) $(CURDIR)
 	@NEW_IMAGE=$$(docker images -q $(LATEST_IMAGE)); \
@@ -47,7 +52,11 @@ list-images:
 	# If we use "-a" here, we get also the internal layers for our image.
 	docker images --filter "label=$(IMAGENAME_LABEL_KEY)=$(IMAGENAME_LABEL_VALUE)"
 
-
+clean: clean-container
+ifneq (,$(OLDTAGS))
+	docker rmi $(OLDTAGS)
+endif
+	docker rmi $$(docker images --filter "label="$(IMAGENAME_LABEL_KEY)"="$(IMAGENAME_LABEL_VALUE) -q) 2>/dev/null || /bin/true
 
 clean-container:
 ifneq (,$(findstring exists,$(CONTAINER_STATUS)))
