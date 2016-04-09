@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo ln -sfv $(pwd)/docker-* /usr/local/bin/
