@@ -2,13 +2,15 @@
 CONTAINER_NAME=$1
 TEST_COMMAND=/bin/true
 
+docker-hascontainer "$CONTAINER_NAME" >/dev/null|| exit 15
+
 docker exec "$CONTAINER_NAME" $TEST_COMMAND 2>/dev/null >/dev/null
 RETURN_STATUS=$?
 
 if [ $RETURN_STATUS -ne 0 ]; then
-    echo "Container $CONTAINER_NAME is NOT running. Exit status: $RETURN_STATUS"
+    >&2 echo "Container $CONTAINER_NAME is NOT running. Exit status: $RETURN_STATUS"
 else
-    echo "Container $CONTAINER_NAME is RUNNING."
+    >&2 echo "Container $CONTAINER_NAME is RUNNING."
 fi
 
 exit $RETURN_STATUS

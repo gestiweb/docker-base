@@ -1,0 +1,15 @@
+#!/bin/bash
+CONTAINER_NAME=$1
+
+if docker-hascontainer "$CONTAINER_NAME" >/dev/null 2>&1; then
+    if docker-isrunning "$CONTAINER_NAME" >/dev/null 2>&1; then
+        echo "exists,running"
+        exit 0;
+    else
+        echo "exists,stopped"
+        exit 1
+    fi
+else
+    echo "notfound"
+    exit 5
+fi

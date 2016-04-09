@@ -1,0 +1,38 @@
+#!/bin/bash
+IMAGE_NAME=$1
+TAG_REGEXP=$2
+if [ "$TAG_REGEXP" = "" ]; then
+    TAG_REGEXP=".*"
+fi
+OUTPUT_MODE=$3
+if [ "$OUTPUT_MODE" = "" ]; then
+    OUTPUT_MODE="--output=tags"
+fi
+if [ "$OUTPUT_MODE" = "-q" ]; then
+    OUTPUT_MODE="--output=images"
+fi
+
+TAGS=$(docker images "$IMAGE_NAME" 2>/dev/null | sed 's/  */ /g' | tail -n+2 | cut -f2 -d' ' | grep -E '^'"$TAG_REGEXP"'$')
+
+if [ "$TAGS" = "" ]; then
+    >&2 echo "No tags for $IMAGE_NAME matching regexp '^$TAG_REGEXP$'"
+    exit 1;
+fi
+
+if [ "$OUTPUT_MODE" = "--output=tags" ]; then
+    for tag in $TAGS; do
+        echo $tag
+    done
+    exit 0;
+fi
+
+if [ "$OUTPUT_MODE" = "--output=images" ]; then
+    for tag in $TAGS; do
+        docker images -q "$IMAGE_NAME:$tag"
+    done
+    exit 0;
+fi
+
+>&2 echo "Unknown output mode."
+>&2 echo "... Known output modes: --output=tags | --output=images | -q"
+
