@@ -1,4 +1,6 @@
-FROM gestiweb/auto:debian-jessie-20160409a
+FROM gestiweb/auto:debian-jessie
+
+LABEL com.gestiweb.docker.image-name=debian-jessie:upgrade
 
 RUN apt-get update -y -qq && \
     aptitude install -y -q2 \

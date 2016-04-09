@@ -5,7 +5,7 @@ CONTAINER_BASENAME := $(IMAGE_NAME)
 
 # IMAGENAME LABELS ALLOWS TO FIND OLD UNTAGGED IMAGES
 IMAGENAME_LABEL_KEY   := com.gestiweb.docker.image-name
-IMAGENAME_LABEL_VALUE := apache-server:dev
+IMAGENAME_LABEL_VALUE := debian-jessie:upgrade
 
 CONTAINER_NAME := $(CONTAINER_BASENAME)-dev
 CONTAINER_STATUS := $(shell docker-status $(CONTAINER_NAME) )
@@ -22,27 +22,49 @@ DATE_IMAGE := $(USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)-$(ts)
 OLDIMAGES := $(shell docker-image-tags $(IMAGE) '$(IMAGE_TAG).*' -q 2>/dev/null)
 OLDTAGS := $(shell docker-image-tags $(IMAGE) '$(IMAGE_TAG).*' -v 2>/dev/null)
 
+OLDIMAGE := $(shell docker images -q $(LATEST_IMAGE))
+
+GITROOT := $(shell git rev-parse --show-toplevel)
 
 help:
-	@echo "make build: -> compile new image $(LATEST_IMAGE) and replace :$(IMAGE_TAG) tag"
-	@echo "make run: -> execute new container $(CONTAINER_NAME) from image $(LATEST_IMAGE), removing the previous container if it exists."
-	@echo "make push: -> push image to docker hub. Implies build."
-	@echo "make list-containers: -> list of known containers using images from this folder"
-	@echo "make list-images: -> list of known images built from this folder"
-	@echo "make clean: -> stops, removes devel containers and removes known images "
-	@echo "make push: -> "
+	@echo "An action is required. List of common actions:"
+	@echo ""
+	@echo "	make build: -> compile new image $(LATEST_IMAGE) and replace :$(IMAGE_TAG) tag"
+	@echo "	make run: -> execute new container $(CONTAINER_NAME) from image $(LATEST_IMAGE)"
+	@echo "	... removing the previous devel container if exists."
+	@echo "	make push: -> push image to docker hub. Implies build."
+	@echo "	make list-containers: -> list of known containers using images from this folder"
+	@echo "	make list-images: -> list of known images built from this folder"
+	@echo "	make clean: -> stops, removes devel containers and removes known images "
+	@echo "	make clean-container: -> stops & removes devel container"
+	@echo "	make status: are devel or production container running?"
+	@echo "	make production: create production container and run it (or start it if it was stopped)"
+	@echo "	make (start|stop|restart)-production: like /etc/init.d/ commands for the production container."
+	@echo "	make destroy-production: destroy/clean the production container and its data."
+	@echo ""
 build:
 	docker build --pull --tag $(LATEST_IMAGE) --tag $(DATE_IMAGE) $(CURDIR)
 	@NEW_IMAGE=$$(docker images -q $(LATEST_IMAGE)); \
 	for oldimage in $(OLDIMAGES); do \
 	    if [ "$$NEW_IMAGE" != "$$oldimage" ]; then \
-		echo "Removing old image $$oldimage . . ." && docker rmi $$oldimage || /bin/true; \
+		 docker rmi $$oldimage 2>/dev/null echo "Removed old image $$oldimage" || /bin/true; \
 	    fi; \
-	done
+	done; \
+	if [ "$$NEW_IMAGE" != "$(OLDIMAGE)" ]; then \
+		echo "NEW IMAGE built -> marking every child project as pending_rebuild"; \
+		for dockerfile in $$(git grep -l "FROM $(LATEST_IMAGE)" -- $(GITROOT)/"*Dockerfile"); do \
+		    touch $$dockerfile.pending_rebuild; \
+		    echo "Created file $$dockerfile.pending_rebuild"; \
+		done;  \
+	fi;
+	@test -f $(CURDIR)/Dockerfile.pending_rebuild && unlink $(CURDIR)/Dockerfile.pending_rebuild || /bin/true;
 
 push: build
 	docker push $(DATE_IMAGE)
 	docker push $(LATEST_IMAGE)
+
+child-builds:
+	 git grep -l "FROM $(LATEST_IMAGE)" -- $(GITROOT)/"*Dockerfile"
 
 
 

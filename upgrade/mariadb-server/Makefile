@@ -1,11 +1,11 @@
 USERNAME := gestiweb
-IMAGE_NAME := debian-jessie
+IMAGE_NAME := mariadb-server
 IMAGE_TAG := upgrade
 CONTAINER_BASENAME := $(IMAGE_NAME)
 
 # IMAGENAME LABELS ALLOWS TO FIND OLD UNTAGGED IMAGES
 IMAGENAME_LABEL_KEY   := com.gestiweb.docker.image-name
-IMAGENAME_LABEL_VALUE := debian-jessie:upgrade
+IMAGENAME_LABEL_VALUE := mariadb-server:upgrade
 
 CONTAINER_NAME := $(CONTAINER_BASENAME)-dev
 CONTAINER_STATUS := $(shell docker-status $(CONTAINER_NAME) )
