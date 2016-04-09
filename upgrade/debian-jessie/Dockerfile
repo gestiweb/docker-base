@@ -1,4 +1,4 @@
-FROM gestiweb/auto:debian-jessie-20160408d
+FROM gestiweb/auto:debian-jessie-20160409a
 
 RUN apt-get update -y -qq && \
     aptitude install -y -q2 \
