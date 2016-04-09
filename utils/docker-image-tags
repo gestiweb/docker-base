@@ -27,9 +27,10 @@ if [ "$OUTPUT_MODE" = "--output=tags" ]; then
 fi
 
 if [ "$OUTPUT_MODE" = "--output=images" ]; then
+    (
     for tag in $TAGS; do
         docker images -q "$IMAGE_NAME:$tag"
-    done
+    done ) | sort -u
     exit 0;
 fi
 
