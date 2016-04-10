@@ -1,0 +1,9 @@
+Imagen de desarrollo
+
+Basada en la imagen "autogenerada"
+
+Funciona con makefiles para pensar menos.
+
+Simplemente "make" y fin!.
+
+(Si no estás en el grupo docker, pues... "sudo make" y tal)

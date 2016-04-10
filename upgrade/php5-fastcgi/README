@@ -1,0 +1,10 @@
+Imagen de desarrollo de php5-fastcgi
+
+Basada en la imagen "autogenerada" de gestiweb/base:php5-fastcgi
+
+
+Funciona con makefiles para pensar menos.
+
+Simplemente "make" y fin!.
+
+(Si no estás en el grupo docker, pues... "sudo make" y tal)
