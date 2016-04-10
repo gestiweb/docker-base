@@ -148,11 +148,6 @@ help:
 
 test:
 	@echo "it works!"
-	@echo "Image Name: $(USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)"
-	@echo "Dockerfile LABEL: $(DOCKERFILE_LABEL)"
-	@echo "Dockerfile FROM_USERNAME: $(DOCKERFILE_FROM_USERNAME)"
-	@echo "Dockerfile FROM_IMAGE: $(DOCKERFILE_FROM_IMAGE)"
-	@echo "Dockerfile FROM_TAG: $(DOCKERFILE_FROM_TAG)"
 
 build:
 	docker build --pull --tag $(LATEST_IMAGE) --tag $(DATE_IMAGE) $(CURDIR)
