@@ -65,6 +65,17 @@ GITROOT := $(shell git rev-parse --show-toplevel)
 FOLDER_TAG := $(notdir $(patsubst %/,%,$(dir $(patsubst %/,%,$(CURDIR)))))
 FOLDER_IMAGE := $(notdir $(patsubst %/,%,$(CURDIR)))
 
+DOCKERFILE_FROM := $(shell head -n5 Dockerfile | grep "FROM" | cut -f2 -d' ')
+DOCKERFILE_LABEL := $(shell head -n5 Dockerfile | grep "LABEL" | grep "$(IMAGENAME_LABEL_KEY)" | cut -f2 -d' ' | cut -f2 -d'=')
+
+# TODO: Yes, i don't know how to do this on Makefile. Using bash instead...
+DOCKERFILE_FROM_USERNAME := $(shell echo $(DOCKERFILE_FROM) | cut -f1 -d'/')
+DOCKERFILE_FROM_IMAGETAG := $(shell echo $(DOCKERFILE_FROM) | cut -f2 -d'/')
+DOCKERFILE_FROM_IMAGE := $(shell echo $(DOCKERFILE_FROM_IMAGETAG) | cut -f1 -d':')
+DOCKERFILE_FROM_TAG := $(shell echo $(DOCKERFILE_FROM_IMAGETAG) | cut -f2 -d':')
+# Analysis of correctness of parameters:
+
+# Folders matches image:tag ?
 ifneq ($(FOLDER_IMAGE), $(IMAGE_NAME))
     $(error IMAGE_NAME is <$(IMAGE_NAME)> and should be <$(FOLDER_IMAGE)>)
 endif
@@ -83,9 +94,40 @@ else
     ifneq ($(IMAGENAME_LABEL_TAG), $(FOLDER_TAG))
         $(error IMAGENAME_LABEL_TAG is <$(IMAGENAME_LABEL_TAG)> and should be <$(FOLDER_TAG)>)
     endif
+endif
+
+# Labels match Dockerfile ?
+
+ifneq ($(IMAGENAME_LABEL_VALUE), $(DOCKERFILE_LABEL))
+    $(error Dockerfile's LABEL value <$(DOCKERFILE_LABEL)> doesn't match with <$(IMAGENAME_LABEL_VALUE)>)
+endif
+
+# From matches rules?
+ifneq ($(DOCKERFILE_FROM_USERNAME),$(USERNAME))
+    $(error Base Image is from a different user <$(DOCKERFILE_FROM_USERNAME)> than the final user <$(USERNAME)>)
+endif
+
+ifeq ($(IMAGE_TAG),upgrade) # upgrade images -> rules
+
+ifneq ($(DOCKERFILE_FROM_IMAGE),auto)
+    $(error Upgrade images should derive from "auto" images)
+endif
+ifneq ($(DOCKERFILE_FROM_TAG),$(IMAGE_NAME))
+    $(error Upgrade image $(IMAGE_NAME) should derive from "auto:$(IMAGE_NAME)" images)
+endif
 
 endif
 
+ifeq ($(IMAGE_TAG),latest) # devel images -> rules
+
+ifneq ($(DOCKERFILE_FROM_IMAGE),$(IMAGE_NAME))
+    $(error Devel images should derive from ":upgrade", got diferent image. )
+endif
+ifneq ($(DOCKERFILE_FROM_TAG),upgrade)
+    $(error Devel images should derive from ":upgrade", got diferent tag. )
+endif
+
+endif
 
 help:
 	@echo "An action is required. List of common actions:"
@@ -103,6 +145,14 @@ help:
 	@echo "	make (start|stop|restart)-production: like /etc/init.d/ commands for the production container."
 	@echo "	make destroy-production: destroy/clean the production container and its data."
 	@echo ""
+
+test:
+	@echo "it works!"
+	@echo "Image Name: $(USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)"
+	@echo "Dockerfile LABEL: $(DOCKERFILE_LABEL)"
+	@echo "Dockerfile FROM_USERNAME: $(DOCKERFILE_FROM_USERNAME)"
+	@echo "Dockerfile FROM_IMAGE: $(DOCKERFILE_FROM_IMAGE)"
+	@echo "Dockerfile FROM_TAG: $(DOCKERFILE_FROM_TAG)"
 
 build:
 	docker build --pull --tag $(LATEST_IMAGE) --tag $(DATE_IMAGE) $(CURDIR)
