@@ -1,19 +1,6 @@
-ts := $(shell /bin/date "+%Y%m%d")
-help:
-	@echo "make build: -> compile new image and replace :latest tag"
-	@echo "make run: -> execute last compiled image, removing the last one."
+USERNAME := gestiweb
+IMAGE_NAME := debian-jessie
+IMAGE_TAG := latest
+IMAGENAME_LABEL_TAG := dev
 
-#remove:
-#	docker images -q gestiweb/debian-jessie:latest
-build:
-	docker build --pull --tag gestiweb/debian-jessie:latest --tag gestiweb/debian-jessie:$(ts) $(CURDIR)
-
-clean-container:
-	@docker stop debian-jessie 2>/dev/null || echo "debian-jessie: Not running. OK."
-	@docker rm debian-jessie 2>/dev/null || echo "debian-jessie: Does not exist yet. OK."
-run: clean-container
-	docker run -d --name debian-jessie gestiweb/debian-jessie:latest
-
-push: build
-	docker push gestiweb/debian-jessie:latest
-	docker push gestiweb/debian-jessie:$(ts)
+include ../../utils/makefiles/template.mk
