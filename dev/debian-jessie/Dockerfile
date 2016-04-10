@@ -1,5 +1,7 @@
 FROM gestiweb/debian-jessie:upgrade
 
+LABEL com.gestiweb.docker.image-name=debian-jessie:dev
+
 RUN apt-get update -y -qq && \
     apt-get dist-upgrade -yqq && apt-get install -yqq \
     nmap && \

@@ -1,5 +1,2 @@
-
-
-push:
-	git push origin master:php5-fastcgi
+include ../../utils/makefiles/template-auto.mk
 

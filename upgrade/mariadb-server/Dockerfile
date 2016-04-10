@@ -1,12 +1,12 @@
 FROM gestiweb/auto:mariadb-server
 
+LABEL com.gestiweb.docker.image-name=mariadb-server:upgrade
+
 RUN apt-get update -y -qq && \
     aptitude install -y -q2 \
     nmap && \
   apt-get dist-upgrade -yqq && apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ENV TERM dumb
 
 COPY start_container.sh /start_container.sh
 

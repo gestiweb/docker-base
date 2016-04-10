@@ -1,5 +1,2 @@
-
-
-push:
-	git push origin master:mariadb-server
+include ../../utils/makefiles/template-auto.mk
 

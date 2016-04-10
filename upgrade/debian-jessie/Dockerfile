@@ -8,6 +8,8 @@ RUN apt-get update -y -qq && \
   apt-get dist-upgrade -yqq && apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+ENV TERM xterm
+
 COPY start_container.sh /start_container.sh
 
 EXPOSE 22

@@ -1,5 +1,2 @@
-
-
-push:
-	git push origin master:apache-server
+include ../../utils/makefiles/template-auto.mk
 

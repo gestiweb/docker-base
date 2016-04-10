@@ -1,5 +1,7 @@
 FROM gestiweb/auto:apache-server
 
+LABEL com.gestiweb.docker.image-name=apache-server:upgrade
+
 RUN apt-get update -y -qq && \
     aptitude install -y -q2 \
     nmap && \

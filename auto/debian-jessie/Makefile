@@ -1,5 +1,3 @@
+include ../../utils/makefiles/template-auto.mk
 
-
-push:
-	git push origin master:debian-jessie
 
