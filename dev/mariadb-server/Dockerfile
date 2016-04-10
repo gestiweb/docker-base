@@ -1,4 +1,7 @@
-FROM gestiweb/base:mariadb-server
+FROM gestiweb/mariadb-server:upgrade
+
+LABEL com.gestiweb.docker.image-name=mariadb-server:dev
+
 
 COPY start_container.sh /start_container.sh
 
