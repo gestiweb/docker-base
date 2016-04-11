@@ -52,12 +52,21 @@ CONT_VOL_NAME := $(CONTAINER_BASENAME)-volume
 endif
 
 ifndef VOLUMES
-VOLUMES := -v $(CONT_VOL_NAME):/var/www/
+VOLUMES :=
+ifdef SHARE_FOLDER
+VOLUMES := -v $(CONT_VOL_NAME):$(SHARE_FOLDER)
+endif
 endif
 
 CONTAINER_STATUS := $(shell docker-status $(CONT_DEVEL_NAME) )
 PRODUCTION_STATUS := $(shell docker-status $(CONT_PROD_NAME) )
 VOLUME_STATUS := $(shell docker-status $(CONT_VOL_NAME) )
+
+ifndef VOLUMES_FROM
+ifneq (,$(findstring exists,$(VOLUME_STATUS)))
+VOLUMES_FROM := $(CONT_VOL_NAME)
+endif
+endif
 
 ts := $(shell /bin/date "+%Y%m%d")
 IMAGE := $(USERNAME)/$(IMAGE_NAME)
@@ -138,6 +147,15 @@ endif
 
 endif
 
+RUN_OPTS :=
+ifdef VOLUMES_FROM
+RUN_OPTS := $(RUN_OPTS) --volumes-from=$(VOLUMES_FROM)
+endif
+ifdef NETWORK_NAME
+RUN_OPTS := $(RUN_OPTS) --net=$(NETWORK_NAME)
+endif
+
+
 help:
 	@echo "An action is required. List of common actions:"
 	@echo ""
@@ -157,6 +175,11 @@ help:
 
 test:
 	@echo "it works!"
+
+brl:
+	make build
+	make run
+	make login
 
 build:
 	docker build --pull --tag $(LATEST_IMAGE) --tag $(DATE_IMAGE) $(CURDIR)
@@ -214,11 +237,7 @@ inspect:
 	@unlink /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
 
 run: clean-container
-ifneq (,$(findstring exists,$(VOLUME_STATUS)))
-	docker run -d --volumes-from $(CONT_VOL_NAME) --name $(CONT_DEVEL_NAME) $(LATEST_IMAGE)
-else
-	docker run -d --name $(CONT_DEVEL_NAME) $(LATEST_IMAGE)
-endif
+	docker run -itd $(RUN_OPTS) --name $(CONT_DEVEL_NAME) --hostname $(CONT_DEVEL_NAME)  $(LATEST_IMAGE)
 
 login:
 ifeq (,$(findstring running,$(CONTAINER_STATUS)))
@@ -264,7 +283,7 @@ else
 endif
 else
 	@echo "Creating a new container from $(LATEST_IMAGE)"
-	docker run -d --name $(CONT_PROD_NAME) $(LATEST_IMAGE)
+	docker run -itd --name $(CONT_PROD_NAME) $(LATEST_IMAGE)
 endif
 
 start-production:
