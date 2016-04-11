@@ -7,8 +7,8 @@
 # IMAGENAME_LABEL_KEY   := com.gestiweb.docker.image-name
 # * IMAGENAME_LABEL_VALUE := $$last_folder_name$$:dev/upgrade/...
 #
-# CONTAINER_NAME := $(CONTAINER_BASENAME)-dev
-# PRODUCTION_NAME := $(CONTAINER_BASENAME)-production
+# CONT_DEVEL_NAME := $(CONTAINER_BASENAME)-dev
+# CONT_PROD_NAME := $(CONTAINER_BASENAME)-production
 # -----------------------------
 
 ifndef USERNAME
@@ -39,16 +39,25 @@ ifndef IMAGENAME_LABEL_VALUE
 IMAGENAME_LABEL_VALUE := $(IMAGE_NAME):$(IMAGENAME_LABEL_TAG)
 endif
 
-ifndef CONTAINER_NAME
-CONTAINER_NAME := $(CONTAINER_BASENAME)-dev
+ifndef CONT_DEVEL_NAME
+CONT_DEVEL_NAME := $(CONTAINER_BASENAME)-dev
 endif
 
-ifndef PRODUCTION_NAME
-PRODUCTION_NAME := $(CONTAINER_BASENAME)-production
+ifndef CONT_PROD_NAME
+CONT_PROD_NAME := $(CONTAINER_BASENAME)-production
 endif
 
-CONTAINER_STATUS := $(shell docker-status $(CONTAINER_NAME) )
-PRODUCTION_STATUS := $(shell docker-status $(PRODUCTION_NAME) )
+ifndef CONT_VOL_NAME
+CONT_VOL_NAME := $(CONTAINER_BASENAME)-volume
+endif
+
+ifndef VOLUMES
+VOLUMES := -v $(CONT_VOL_NAME):/var/www/
+endif
+
+CONTAINER_STATUS := $(shell docker-status $(CONT_DEVEL_NAME) )
+PRODUCTION_STATUS := $(shell docker-status $(CONT_PROD_NAME) )
+VOLUME_STATUS := $(shell docker-status $(CONT_VOL_NAME) )
 
 ts := $(shell /bin/date "+%Y%m%d")
 IMAGE := $(USERNAME)/$(IMAGE_NAME)
@@ -133,7 +142,7 @@ help:
 	@echo "An action is required. List of common actions:"
 	@echo ""
 	@echo "	make build: -> compile new image $(LATEST_IMAGE) and replace :$(IMAGE_TAG) tag"
-	@echo "	make run: -> execute new container $(CONTAINER_NAME) from image $(LATEST_IMAGE)"
+	@echo "	make run: -> execute new container $(CONT_DEVEL_NAME) from image $(LATEST_IMAGE)"
 	@echo "	... removing the previous devel container if exists."
 	@echo "	make push: -> push image to docker hub. Implies build."
 	@echo "	make list-containers: -> list of known containers using images from this folder"
@@ -190,15 +199,56 @@ endif
 clean-container:
 ifneq (,$(findstring exists,$(CONTAINER_STATUS)))
 ifneq (,$(findstring running,$(CONTAINER_STATUS)))
-		@echo "Stopping container $(CONTAINER_NAME) . . ."
-		docker stop $(CONTAINER_NAME)
+		@echo "Stopping container $(CONT_DEVEL_NAME) . . ."
+		docker stop $(CONT_DEVEL_NAME)
 endif
-	    @echo "Removing container $(CONTAINER_NAME) . . ."
-	    docker rm $(CONTAINER_NAME)
+	    @echo "Removing container $(CONT_DEVEL_NAME) . . ."
+	    docker rm $(CONT_DEVEL_NAME)
 endif
 
+inspect:
+	docker inspect $(CONT_DEVEL_NAME) > /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
+	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py StartedAt
+	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py ExitCode
+	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py -Networks IPAddress
+	@unlink /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
+
 run: clean-container
-	docker run -d --name $(CONTAINER_NAME) $(LATEST_IMAGE)
+ifneq (,$(findstring exists,$(VOLUME_STATUS)))
+	docker run -d --volumes-from $(CONT_VOL_NAME) --name $(CONT_DEVEL_NAME) $(LATEST_IMAGE)
+else
+	docker run -d --name $(CONT_DEVEL_NAME) $(LATEST_IMAGE)
+endif
+
+login:
+ifeq (,$(findstring running,$(CONTAINER_STATUS)))
+	@echo "Container $(CONT_DEVEL_NAME) is not running. 'make run' will be executed now . . .  "
+	make run
+endif
+	docker exec -it  $(CONT_DEVEL_NAME) /bin/bash
+
+create-volume:
+ifneq (,$(findstring exists,$(VOLUME_STATUS)))
+	$(error Volume already exists. Run drop-volume or recreate-volume)
+endif
+	docker volume create --name $(CONT_VOL_NAME)
+	docker create $(VOLUMES) --name $(CONT_VOL_NAME) $(LATEST_IMAGE) /bin/true
+
+recreate-volume:
+ifneq (,$(findstring exists,$(VOLUME_STATUS)))
+	docker rm $(CONT_VOL_NAME)
+endif
+	docker volume create --name $(CONT_VOL_NAME)
+	docker create $(VOLUMES) --name $(CONT_VOL_NAME) $(LATEST_IMAGE) /bin/true
+
+drop-volume:
+ifeq (,$(findstring exists,$(VOLUME_STATUS)))
+	$(error Volume does not exist. Run create-volume)
+endif
+	docker rm $(CONT_VOL_NAME)
+	docker volume rm $(CONT_VOL_NAME)
+
+
 
 status:
 	@echo "Devel Status: $(CONTAINER_STATUS)"
@@ -207,63 +257,65 @@ status:
 production:
 ifneq (,$(findstring exists,$(PRODUCTION_STATUS)))
 ifneq (,$(findstring running,$(PRODUCTION_STATUS)))
-	@echo "Container $(PRODUCTION_NAME) is already running. Nothing done. "
+	@echo "Container $(CONT_PROD_NAME) is already running. Nothing done. "
+else
+	@echo "Starting stopped container $(CONT_PROD_NAME) . . . "
+	docker start $(CONT_PROD_NAME)
 endif
-	@echo "Starting stopped container $(PRODUCTION_NAME) . . . "
-	docker start $(PRODUCTION_NAME)
 else
 	@echo "Creating a new container from $(LATEST_IMAGE)"
-	docker run -d --name $(PRODUCTION_NAME) $(LATEST_IMAGE)
+	docker run -d --name $(CONT_PROD_NAME) $(LATEST_IMAGE)
 endif
 
 start-production:
 ifneq (,$(findstring exists,$(PRODUCTION_STATUS)))
 ifneq (,$(findstring running,$(PRODUCTION_STATUS)))
-	$(error Container $(PRODUCTION_NAME) is already running.)
+	$(error Container $(CONT_PROD_NAME) is already running.)
+else
+	@echo "Starting stopped container $(CONT_PROD_NAME) . . . "
+	docker start $(CONT_PROD_NAME)
 endif
-	@echo "Starting stopped container $(PRODUCTION_NAME) . . . "
-	docker start $(PRODUCTION_NAME)
 else
 	@echo "Creating a new container from $(LATEST_IMAGE)"
-	docker run -d --name $(PRODUCTION_NAME) $(LATEST_IMAGE)
+	docker run -d --name $(CONT_PROD_NAME) $(LATEST_IMAGE)
 endif
 
 stop-production:
 ifneq (,$(findstring exists,$(PRODUCTION_STATUS)))
 ifneq (,$(findstring running,$(PRODUCTION_STATUS)))
-	@echo "Stopping container $(PRODUCTION_NAME) . . . "
-	docker stop $(PRODUCTION_NAME)
+	@echo "Stopping container $(CONT_PROD_NAME) . . . "
+	docker stop $(CONT_PROD_NAME)
 else
-	$(error Container $(PRODUCTION_NAME) was not running.)
+	$(error Container $(CONT_PROD_NAME) was not running.)
 endif
 else
-	$(error Container $(PRODUCTION_NAME) does not exist.)
+	$(error Container $(CONT_PROD_NAME) does not exist.)
 endif
 
 
 restart-production:
 ifneq (,$(findstring exists,$(PRODUCTION_STATUS)))
 ifneq (,$(findstring running,$(PRODUCTION_STATUS)))
-	@echo "Re-starting running container $(PRODUCTION_NAME) . . . "
-	docker restart $(PRODUCTION_NAME)
+	@echo "Re-starting running container $(CONT_PROD_NAME) . . . "
+	docker restart $(CONT_PROD_NAME)
 else
-	@echo "Container status was stopped. Starting container $(PRODUCTION_NAME) anyways . . . "
-	docker start $(PRODUCTION_NAME)
+	@echo "Container status was stopped. Starting container $(CONT_PROD_NAME) anyways . . . "
+	docker start $(CONT_PROD_NAME)
 endif
 else
-	$(error Container $(PRODUCTION_NAME) does not exist.)
+	$(error Container $(CONT_PROD_NAME) does not exist.)
 endif
 
 destroy-production:
 ifneq (,$(findstring exists,$(PRODUCTION_STATUS)))
 ifneq (,$(findstring running,$(PRODUCTION_STATUS)))
-	$(error Container $(PRODUCTION_NAME) was running. Cowardly refusing to stop it and destroy your data.)
+	$(error Container $(CONT_PROD_NAME) was running. Cowardly refusing to stop it and destroy your data.)
 else
-	@echo "Container status was stopped. Destroying container $(PRODUCTION_NAME) and its data . . . "
-	docker rm $(PRODUCTION_NAME)
+	@echo "Container status was stopped. Destroying container $(CONT_PROD_NAME) and its data . . . "
+	docker rm $(CONT_PROD_NAME)
 endif
 else
-	$(error Container $(PRODUCTION_NAME) does not exist.)
+	$(error Container $(CONT_PROD_NAME) does not exist.)
 endif
 
 

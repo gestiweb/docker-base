@@ -2,7 +2,10 @@
 CONTAINER_NAME=$1
 TEST_COMMAND=/bin/true
 
-CONTAINER_ID=$(docker ps -f name="$CONTAINER_NAME" -a -q)
+docker inspect "$CONTAINER_NAME" 2>/dev/null >/dev/null || exit 5;
+exit 0;
+
+CONTAINER_ID=$(docker ps -f name="$CONTAINER_NAME$$" -a -q)
 
 if [ "$CONTAINER_ID" = "" ]; then
     >&2 echo "Container $CONTAINER_NAME does not exist."
