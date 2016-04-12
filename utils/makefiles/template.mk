@@ -48,14 +48,15 @@ CONT_PROD_NAME := $(CONTAINER_BASENAME)-production
 endif
 
 ifndef CONT_VOL_NAME
+ifdef VOLUMES_FROM
+CONT_VOL_NAME := $(VOLUMES_FROM)
+else
 CONT_VOL_NAME := $(CONTAINER_BASENAME)-volume
 endif
+endif
 
-ifndef VOLUMES
-VOLUMES :=
 ifdef SHARE_FOLDER
 VOLUMES := -v $(CONT_VOL_NAME):$(SHARE_FOLDER)
-endif
 endif
 
 CONTAINER_STATUS := $(shell docker-status $(CONT_DEVEL_NAME) )
@@ -237,6 +238,21 @@ inspect:
 	@unlink /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
 
 run: clean-container
+ifdef SHARE_FOLDER
+ifeq (,$(findstring exists,$(VOLUME_STATUS)))
+	@echo "Creating volume . . ."
+	docker volume create --name $(CONT_VOL_NAME)
+	docker create $(VOLUMES) --name $(CONT_VOL_NAME) $(LATEST_IMAGE) /bin/true
+endif
+endif
+ifdef VOLUMES_FROM
+ifeq (,$(findstring exists,$(VOLUME_STATUS)))
+	$(error Volume container $(VOLUMES_FROM) is not created yet)
+endif
+endif
+ifdef NETWORK_NAME
+	docker-hasnetwork $(NETWORK_NAME) || make create-network
+endif
 	docker run -itd $(RUN_OPTS) --name $(CONT_DEVEL_NAME) --hostname $(CONT_DEVEL_NAME)  $(LATEST_IMAGE)
 
 login:
@@ -248,10 +264,11 @@ endif
 
 create-volume:
 ifneq (,$(findstring exists,$(VOLUME_STATUS)))
-	$(error Volume already exists. Run drop-volume or recreate-volume)
-endif
+	@echo "Volume already exists."
+else
 	docker volume create --name $(CONT_VOL_NAME)
 	docker create $(VOLUMES) --name $(CONT_VOL_NAME) $(LATEST_IMAGE) /bin/true
+endif
 
 recreate-volume:
 ifneq (,$(findstring exists,$(VOLUME_STATUS)))
@@ -337,15 +354,15 @@ else
 	$(error Container $(CONT_PROD_NAME) does not exist.)
 endif
 
-ifdef NETWORK_NNAME
-network-create:
+ifdef NETWORK_NAME
+create-network:
 	docker network create --driver bridge $(NETWORK_NAME)
 
 
-network-remove:
+remove-network:
 	docker network rm $(NETWORK_NAME)
 
-network-inspect:
+inspect-network:
 	docker network inspect $(NETWORK_NAME)
 endif
 

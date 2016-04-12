@@ -1,0 +1,5 @@
+#!/bin/bash
+NETWORK_NAME=$1
+
+docker network inspect "$NETWORK_NAME" 2>/dev/null >/dev/null || exit 5;
+exit 0;
