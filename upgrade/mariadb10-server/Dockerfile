@@ -1,6 +1,6 @@
-FROM gestiweb/auto:mariadb-server
+FROM gestiweb/auto:mariadb10-server
 
-LABEL com.gestiweb.docker.image-name=mariadb-server:upgrade
+LABEL com.gestiweb.docker.image-name=mariadb10-server:upgrade
 
 RUN apt-get update -y -qq && \
     aptitude install -y -q2 \

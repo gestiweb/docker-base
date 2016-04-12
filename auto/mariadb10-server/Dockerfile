@@ -10,6 +10,7 @@ RUN apt-get update -y -qq && \
     maria-doc \
     mariadb-client \
     mariadb-server \
+    mariadb-server-10.0 \
     tinyca \
     && \
     rm -rf /var/lib/apt/lists/* && \
