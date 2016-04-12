@@ -233,7 +233,7 @@ inspect:
 	docker inspect $(CONT_DEVEL_NAME) > /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
 	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py StartedAt
 	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py ExitCode
-	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py -Networks IPAddress
+	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py IPAddress
 	@unlink /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
 
 run: clean-container
