@@ -337,5 +337,15 @@ else
 	$(error Container $(CONT_PROD_NAME) does not exist.)
 endif
 
+ifdef NETWORK_NNAME
+network-create:
+	docker network create --driver bridge $(NETWORK_NAME)
 
+
+network-remove:
+	docker network rm $(NETWORK_NAME)
+
+network-inspect:
+	docker network inspect $(NETWORK_NAME)
+endif
 
