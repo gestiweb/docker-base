@@ -31,7 +31,7 @@ DOCKERFILE_FROM_IMAGE := $(shell echo $(DOCKERFILE_FROM_IMAGETAG) | cut -f1 -d':
 DOCKERFILE_FROM_TAG := $(shell echo $(DOCKERFILE_FROM_IMAGETAG) | cut -f2 -d':')
 
 push:
-	#git push origin master:$(FOLDER_IMAGE)
+	git push origin master:$(FOLDER_IMAGE)
 ifdef LATEST_IMAGE
 	@echo "... marking every child project as pending_rebuild"; \
 	for dockerfile in $$(git grep -l "FROM $(LATEST_IMAGE)" -- $(GITROOT)/"*Dockerfile"); do \
