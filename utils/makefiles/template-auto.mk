@@ -30,6 +30,10 @@ DOCKERFILE_FROM_IMAGETAG := $(shell echo $(DOCKERFILE_FROM) | cut -f2 -d'/')
 DOCKERFILE_FROM_IMAGE := $(shell echo $(DOCKERFILE_FROM_IMAGETAG) | cut -f1 -d':')
 DOCKERFILE_FROM_TAG := $(shell echo $(DOCKERFILE_FROM_IMAGETAG) | cut -f2 -d':')
 
+pull:
+	docker pull $(LATEST_IMAGE)
+
+
 push:
 	git push origin master:$(FOLDER_IMAGE)
 ifdef LATEST_IMAGE

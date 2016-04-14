@@ -181,6 +181,8 @@ brl:
 	make build
 	make run
 	make login
+pull:
+	docker pull $(LATEST_IMAGE)
 
 build:
 	docker build --pull --tag $(LATEST_IMAGE) --tag $(DATE_IMAGE) $(CURDIR)
