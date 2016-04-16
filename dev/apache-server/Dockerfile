@@ -9,6 +9,8 @@ RUN a2ensite 001-site.conf
 
 COPY start_container.sh /start_container.sh
 
+ADD extra_software/phpmyadmin /var/www/phpmyadmin
+
 EXPOSE 80
 
 CMD ["/start_container.sh"]
