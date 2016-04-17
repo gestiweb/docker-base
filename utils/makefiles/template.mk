@@ -204,7 +204,11 @@ build:
 	fi;
 	@test -f $(CURDIR)/Dockerfile.pending_rebuild && unlink $(CURDIR)/Dockerfile.pending_rebuild || /bin/true;
 
-push:
+push: build
+	docker push $(DATE_IMAGE)
+	docker push $(LATEST_IMAGE)
+
+push-only:
 	docker push $(DATE_IMAGE)
 	docker push $(LATEST_IMAGE)
 
