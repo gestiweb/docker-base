@@ -98,7 +98,9 @@ test -f /var/lib/mysql/root.passwd || {
     mysql -u root -B <<HEREDOC--HEREDOC
 UPDATE mysql.user SET Password = PASSWORD('$pass1') WHERE User = 'root';
 UPDATE mysql.user SET Password = PASSWORD('$pass2') WHERE User = 'debian-sys-maint';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$pass1' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
+
 HEREDOC--HEREDOC
     echo "done."
 }
