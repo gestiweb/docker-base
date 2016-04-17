@@ -152,6 +152,9 @@ RUN_OPTS :=
 ifdef VOLUMES_FROM
 RUN_OPTS := $(RUN_OPTS) --volumes-from=$(VOLUMES_FROM)
 endif
+ifdef SHARE_FOLDER
+RUN_OPTS := $(RUN_OPTS) --volumes-from=$(CONT_VOL_NAME)
+endif
 ifdef NETWORK_NAME
 RUN_OPTS := $(RUN_OPTS) --net=$(NETWORK_NAME)
 endif
@@ -237,6 +240,7 @@ inspect:
 	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py StartedAt
 	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py ExitCode
 	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py IPAddress
+	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py Mounts
 	@unlink /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
 
 run: clean-container
