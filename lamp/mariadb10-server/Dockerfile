@@ -1,6 +1,6 @@
 FROM gestiweb/mariadb10-server:upgrade
 
-LABEL com.gestiweb.docker.image-name=mariadb10-server:dev
+LABEL com.gestiweb.docker.image-name=mariadb10-server:lamp
 
 RUN sed -i 's/bind-address[\t ]*=.*$/bind-address = 0.0.0.0/'  /etc/mysql/my.cnf
 

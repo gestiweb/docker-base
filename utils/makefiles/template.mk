@@ -289,11 +289,11 @@ endif
 
 drop-volume:
 ifeq (,$(findstring exists,$(VOLUME_STATUS)))
-	$(error Volume does not exist. Run create-volume)
-endif
+	@echo "Volume does not exist. Run create-volume"
+else
 	docker rm $(CONT_VOL_NAME)
 	docker volume rm $(CONT_VOL_NAME)
-
+endif
 
 
 status:

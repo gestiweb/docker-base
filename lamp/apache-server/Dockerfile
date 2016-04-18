@@ -1,5 +1,5 @@
 FROM gestiweb/apache-server:upgrade
-LABEL com.gestiweb.docker.image-name=apache-server:dev
+LABEL com.gestiweb.docker.image-name=apache-server:lamp
 
 RUN a2enmod actions proxy_fcgi
 
