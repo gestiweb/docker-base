@@ -1,0 +1,8 @@
+deb http://ftp.ch.debian.org/debian jessie main contrib non-free
+deb http://ftp.ch.debian.org/debian jessie-updates main contrib non-free
+deb http://security.debian.org jessie/updates main contrib non-free
+
+
+deb http://ftp.ch.debian.org/debian testing main
+deb http://ftp.ch.debian.org/debian unstable main
+

@@ -31,6 +31,10 @@ ifndef IMAGENAME_LABEL_TAG
     $(error IMAGENAME_LABEL_TAG must be defined to use this template.)
 endif
 
+ifndef IMAGE_NAME_PARENT
+IMAGE_NAME_PARENT := $(IMAGE_NAME)
+endif
+
 ifndef IMAGENAME_LABEL_KEY
 IMAGENAME_LABEL_KEY := com.gestiweb.docker.image-name
 endif
@@ -139,8 +143,8 @@ endif
 
 ifeq ($(IMAGE_TAG),latest) # devel images -> rules
 
-ifneq ($(DOCKERFILE_FROM_IMAGE),$(IMAGE_NAME))
-    $(error Devel images should derive from ":upgrade", got diferent image. )
+ifneq ($(DOCKERFILE_FROM_IMAGE),$(IMAGE_NAME_PARENT))
+    $(error Devel images should derive from "$(IMAGE_NAME):upgrade", got diferent image. $(DOCKERFILE_FROM_IMAGE):$(DOCKERFILE_FROM_TAG) )
 endif
 ifneq ($(DOCKERFILE_FROM_TAG),upgrade)
     $(error Devel images should derive from ":upgrade", got diferent tag. )
@@ -148,7 +152,10 @@ endif
 
 endif
 
+ifndef RUN_OPTS
 RUN_OPTS :=
+endif
+
 ifdef VOLUMES_FROM
 RUN_OPTS := $(RUN_OPTS) --volumes-from=$(VOLUMES_FROM)
 endif
@@ -205,12 +212,12 @@ build:
 	@test -f $(CURDIR)/Dockerfile.pending_rebuild && unlink $(CURDIR)/Dockerfile.pending_rebuild || /bin/true;
 
 push: build
-	docker push $(DATE_IMAGE)
 	docker push $(LATEST_IMAGE)
+	docker push $(DATE_IMAGE)
 
 push-only:
-	docker push $(DATE_IMAGE)
 	docker push $(LATEST_IMAGE)
+	docker push $(DATE_IMAGE)
 
 child-builds:
 	 git grep -l "FROM $(LATEST_IMAGE)" -- $(GITROOT)/"*Dockerfile"
@@ -270,7 +277,7 @@ ifeq (,$(findstring running,$(CONTAINER_STATUS)))
 	@echo "Container $(CONT_DEVEL_NAME) is not running. 'make run' will be executed now . . .  "
 	make run
 endif
-	docker exec -it  $(CONT_DEVEL_NAME) /bin/bash
+	docker exec -it  $(CONT_DEVEL_NAME) /bin/bash || /bin/true
 
 create-volume:
 ifneq (,$(findstring exists,$(VOLUME_STATUS)))

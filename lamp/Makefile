@@ -15,10 +15,12 @@ bootstrap:
 	make inspect
 
 mrproper:
+	docker rm mariadb10-server-volume apache-server-volume || /bin/true
 	docker-autoclean
 	(cd php5-fastcgi && make clean)
 	(cd mariadb10-server && make clean && make drop-volume)
 	(cd apache-server && make clean && make drop-volume)
+	docker volume rm  apache-server-volume mariadb10-server-volume || /bin/true
 
 all: mrproper bootstrap
 
