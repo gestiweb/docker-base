@@ -154,3 +154,7 @@ Also referred as the "dev" or "developing" layer.
 
 
 
+Add to /etc/default/grub:
+
+GRUB_CMDLINE_LINUX_DEFAULT="cgroup_enable=memory swapaccount=1 zswap.enabled=1 quiet splash"
+
