@@ -179,6 +179,7 @@ help:
 	@echo "	make clean: -> stops, removes devel containers and removes known images "
 	@echo "	make clean-container: -> stops & removes devel container"
 	@echo "	make status: are devel or production container running?"
+	@echo "	make inspect: meaningful data about containers, like networks"
 	@echo "	make production: create production container and run it (or start it if it was stopped)"
 	@echo "	make (start|stop|restart)-production: like /etc/init.d/ commands for the production container."
 	@echo "	make destroy-production: destroy/clean the production container and its data."
