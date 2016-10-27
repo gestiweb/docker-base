@@ -51,6 +51,10 @@ ifndef CONT_PROD_NAME
 CONT_PROD_NAME := $(CONTAINER_BASENAME)-production
 endif
 
+ifndef RULE_ENFORCEMENT
+RULE_ENFORCEMENT := strict
+endif
+
 ifndef CONT_VOL_NAME
 ifdef VOLUMES_FROM
 CONT_VOL_NAME := $(VOLUMES_FROM)
@@ -125,7 +129,8 @@ ifneq ($(IMAGENAME_LABEL_VALUE), $(DOCKERFILE_LABEL))
     $(error Dockerfile's LABEL value <$(DOCKERFILE_LABEL)> doesn't match with <$(IMAGENAME_LABEL_VALUE)>)
 endif
 
-# From matches rules?
+ifeq ($(RULE_ENFORCEMENT), strict)
+#  From matches rules?
 ifneq ($(DOCKERFILE_FROM_USERNAME),$(USERNAME))
     $(error Base Image is from a different user <$(DOCKERFILE_FROM_USERNAME)> than the final user <$(USERNAME)>)
 endif
@@ -152,6 +157,8 @@ endif
 
 endif
 
+endif
+
 ifndef RUN_OPTS
 RUN_OPTS :=
 endif
@@ -173,6 +180,7 @@ help:
 	@echo "	make build: -> compile new image $(LATEST_IMAGE) and replace :$(IMAGE_TAG) tag"
 	@echo "	make run: -> execute new container $(CONT_DEVEL_NAME) from image $(LATEST_IMAGE)"
 	@echo "	... removing the previous devel container if exists."
+	@echo "	make debug: same as 'run', but doesn't fork and auto-deletes after exiting. for debugging run problems"
 	@echo "	make push: -> push image to docker hub. Implies build."
 	@echo "	make list-containers: -> list of known containers using images from this folder"
 	@echo "	make list-images: -> list of known images built from this folder"
@@ -273,12 +281,31 @@ ifdef NETWORK_NAME
 endif
 	docker run -itd $(RUN_OPTS) --name $(CONT_DEVEL_NAME) --hostname $(CONT_DEVEL_NAME)  $(LATEST_IMAGE)
 
+debug: clean-container
+ifdef SHARE_FOLDER
+ifeq (,$(findstring exists,$(VOLUME_STATUS)))
+	@echo "Creating volume . . ."
+	docker volume create --name $(CONT_VOL_NAME)
+	docker create $(VOLUMES) --name $(CONT_VOL_NAME) $(LATEST_IMAGE) /bin/true
+endif
+endif
+ifdef VOLUMES_FROM
+ifeq (,$(findstring exists,$(VOLUME_STATUS)))
+	$(error Volume container $(VOLUMES_FROM) is not created yet)
+endif
+endif
+ifdef NETWORK_NAME
+	docker-hasnetwork $(NETWORK_NAME) || make create-network
+endif
+	docker run --rm -it $(RUN_OPTS) --name $(CONT_DEVEL_NAME) --hostname $(CONT_DEVEL_NAME)  $(LATEST_IMAGE) || /bin/true
+
+
 login:
 ifeq (,$(findstring running,$(CONTAINER_STATUS)))
 	@echo "Container $(CONT_DEVEL_NAME) is not running. 'make run' will be executed now . . .  "
 	make run
 endif
-	docker exec -it  $(CONT_DEVEL_NAME) /bin/bash || /bin/true
+	docker exec -u root -it  $(CONT_DEVEL_NAME) /bin/bash || /bin/true
 
 create-volume:
 ifneq (,$(findstring exists,$(VOLUME_STATUS)))

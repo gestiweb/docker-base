@@ -101,9 +101,9 @@ Example route of compiling
 *TL-DR;*
 
 ```
-(raw-jessie) RAW -> BUNDLE -> UPGRADE -> RELEASE (debian-jessie)
-                                |
-      /-------------------------/
+(raw-jessie) RAW (base) -> BUNDLE (auto) -> UPGRADE  -> RELEASE (debian-jessie)
+                                              |
+      /---------------------------------------/
       |
       |\
       | \
