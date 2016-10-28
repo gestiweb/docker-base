@@ -182,6 +182,8 @@ help:
 	@echo "	... removing the previous devel container if exists."
 	@echo "	make debug: same as 'run', but doesn't fork and auto-deletes after exiting. for debugging run problems"
 	@echo "	make push: -> push image to docker hub. Implies build."
+	@echo "	make brl: -> build -> run -> login"
+	@echo "	make brd: -> build -> run (debug)"
 	@echo "	make list-containers: -> list of known containers using images from this folder"
 	@echo "	make list-images: -> list of known images built from this folder"
 	@echo "	make clean: -> stops, removes devel containers and removes known images "
@@ -200,6 +202,11 @@ brl:
 	make build
 	make run
 	make login
+
+brd:
+	make build
+	make run-debug
+
 pull:
 	docker pull $(LATEST_IMAGE)
 
@@ -263,7 +270,7 @@ inspect:
 	@cat /tmp/.docker.inspect.$(CONT_DEVEL_NAME) | python ../../utils/filter-json.py Mounts
 	@unlink /tmp/.docker.inspect.$(CONT_DEVEL_NAME)
 
-run: clean-container
+prepare-run: clean-container
 ifdef SHARE_FOLDER
 ifeq (,$(findstring exists,$(VOLUME_STATUS)))
 	@echo "Creating volume . . ."
@@ -279,24 +286,11 @@ endif
 ifdef NETWORK_NAME
 	docker-hasnetwork $(NETWORK_NAME) || make create-network
 endif
+
+run: prepare-run
 	docker run -itd $(RUN_OPTS) --name $(CONT_DEVEL_NAME) --hostname $(CONT_DEVEL_NAME)  $(LATEST_IMAGE)
 
-debug: clean-container
-ifdef SHARE_FOLDER
-ifeq (,$(findstring exists,$(VOLUME_STATUS)))
-	@echo "Creating volume . . ."
-	docker volume create --name $(CONT_VOL_NAME)
-	docker create $(VOLUMES) --name $(CONT_VOL_NAME) $(LATEST_IMAGE) /bin/true
-endif
-endif
-ifdef VOLUMES_FROM
-ifeq (,$(findstring exists,$(VOLUME_STATUS)))
-	$(error Volume container $(VOLUMES_FROM) is not created yet)
-endif
-endif
-ifdef NETWORK_NAME
-	docker-hasnetwork $(NETWORK_NAME) || make create-network
-endif
+run-debug: prepare-run
 	docker run --rm -it $(RUN_OPTS) --name $(CONT_DEVEL_NAME) --hostname $(CONT_DEVEL_NAME)  $(LATEST_IMAGE) || /bin/true
 
 

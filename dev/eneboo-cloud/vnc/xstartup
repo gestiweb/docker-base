@@ -3,22 +3,22 @@
 unset SESSION_MANAGER
 #unset DBUS_SESSION_BUS_ADDRESS
 
-#startxfce4 &
 #export XKL_XMODMAP_DISABLE=1
 
-
-[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
 [ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
 xsetroot -solid grey
-vncconfig -iconic &
 
-exec /etc/X11/xinit/xinitrc
-#/etc/xdg/xfce4/xinitrc
+/usr/bin/openbox &
+sleep 1
 
-#x-terminal-emulator -geometry 80x24+10+10 -ls -title "$VNCDESKTOP Desktop" &
-#exec /usr/bin/xfce4-session &
-#exec /usr/bin/blackbox &
-#sleep 2
+echo "Starting Eneboo . . ."
+if [ -n "$ENEBOO_CONNSTRING" ]
+then
+    $HOME/scripts/timeout.sh 60 /usr/bin/display-im6 $HOME/Desktop/splashclient.png &
+    /usr/local/bin/eneboo -silentconn "$ENEBOO_CONNSTRING"
+else
+    /usr/local/bin/eneboo
+fi
 
-exec eneboo
-#exec /etc/X11/xinit/xinitrc
+echo "Eneboo closed."
+

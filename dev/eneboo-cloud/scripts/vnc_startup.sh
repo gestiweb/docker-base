@@ -33,4 +33,3 @@ case $i in
     ;;
 esac
 done
-sleep 1000
