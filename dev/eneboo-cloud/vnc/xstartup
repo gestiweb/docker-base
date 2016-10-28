@@ -9,16 +9,20 @@ unset SESSION_MANAGER
 xsetroot -solid grey
 
 /usr/bin/openbox &
-sleep 1
 
-echo "Starting Eneboo . . ."
-if [ -n "$ENEBOO_CONNSTRING" ]
-then
-    $HOME/scripts/timeout.sh 60 /usr/bin/display-im6 $HOME/Desktop/splashclient.png &
-    /usr/local/bin/eneboo -silentconn "$ENEBOO_CONNSTRING"
-else
-    /usr/local/bin/eneboo
-fi
+sleep 2
+for nrun in $(seq 1000)
+do
+    echo "Starting Eneboo . . . (run num: $nrun)"
+    if [ -n "$ENEBOO_CONNSTRING" ]
+    then
+        $HOME/scripts/timeout.sh 60 /usr/bin/display-im6 $HOME/Desktop/splashclient.png &
+        /usr/local/bin/eneboo -silentconn "$ENEBOO_CONNSTRING"
+    else
+        /usr/local/bin/eneboo
+    fi
 
-echo "Eneboo closed."
+    echo "Eneboo closed. (run num: $nrun)"
+    sleep 5;
+done
 

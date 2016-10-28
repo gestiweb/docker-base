@@ -37,6 +37,8 @@ ADD scripts $HOME/scripts
 RUN chmod +x $HOME/.vnc/xstartup /etc/X11/xinit/xinitrc $HOME/scripts/*.sh $HOME/Desktop/*.desktop
 RUN ln -sf /opt/eneboo-2.4-linux64-quick/bin/eneboo /usr/local/bin/eneboo
 
+RUN cp $HOME/scripts/vnc_auto.html $HOME/noVNC/vnc_auto.html
+
 RUN chown -R eneboo:eneboo $HOME
 
 USER eneboo
