@@ -186,7 +186,7 @@ help:
 	@echo "	make brd: -> build -> run (debug)"
 	@echo "	make list-containers: -> list of known containers using images from this folder"
 	@echo "	make list-images: -> list of known images built from this folder"
-	@echo "	make clean: -> stops, removes devel containers and removes known images "
+	@echo "	make clean-build: -> stops, removes devel containers and removes known images "
 	@echo "	make clean-container: -> stops & removes devel container"
 	@echo "	make status: are devel or production container running?"
 	@echo "	make inspect: meaningful data about containers, like networks"
@@ -246,7 +246,7 @@ list-images:
 	# If we use "-a" here, we get also the internal layers for our image.
 	docker images --filter "label=$(IMAGENAME_LABEL_KEY)=$(IMAGENAME_LABEL_VALUE)"
 
-clean: clean-container
+clean-build: clean-container
 ifneq (,$(OLDTAGS))
 	docker rmi $(OLDTAGS)
 endif
